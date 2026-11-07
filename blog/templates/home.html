@@ -1,0 +1,98 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Главная — MyBlog{% endblock %}
+
+{% block content %}
+
+<div class="page-heading">
+    <h1>Добро пожаловать в MyBlog.</h1>
+    <p>Место, где каждый может поделиться своими мыслями.</p>
+</div>
+
+{% if user.is_authenticated %}
+    <section class="card" id="create-post">
+        <h2>Создать публикацию</h2>
+
+        <form method="POST" action="{% url 'create_post' %}">
+            {% csrf_token %}
+
+            <input
+                type="text"
+                name="title"
+                placeholder="Название публикации"
+                maxlength="200"
+                required
+            >
+
+            <textarea
+                name="content"
+                placeholder="О чём хотите рассказать?"
+                required
+            ></textarea>
+
+            <button type="submit">Опубликовать</button>
+        </form>
+    </section>
+{% else %}
+    <section class="card">
+        <h2>Есть чем поделиться?</h2>
+        <p>Войдите в аккаунт, чтобы создавать собственные публикации и общаться с другими пользователями.</p>
+        <a href="{% url 'login' %}" class="button">Войти</a>
+        <a href="{% url 'register' %}" class="button button-secondary">Регистрация</a>
+    </section>
+{% endif %}
+
+<div class="page-heading">
+    <h2>Последние публикации</h2>
+    <p>Свежие записи от пользователей</p>
+</div>
+
+{% for post in posts %}
+    <article class="card">
+        <h2 class="post-title">
+            <a href="{% url 'post_detail' post.id %}">
+                {{ post.title }}
+            </a>
+            <div class="post-content">
+            {{ post.content|linebreaks }}
+        </div>
+        </h2>
+
+        <div class="meta">
+            Автор:
+            {% if post.author %}
+                {{ post.author.username }}
+            {% else %}
+                Неизвестный автор
+            {% endif %}
+            · {{ post.created_at|date:"d.m.Y H:i" }}
+            <div class="comments-preview">
+    <h3>Комментарии ({{ post.comments_count }})</h3>
+
+    {% for comment in post.comments_preview %}
+        <div class="comment">
+            <strong>{{ comment.author.username }}</strong>
+            <p>{{ comment.content }}</p>
+            <small>{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+        </div>
+    {% empty %}
+        <p class="empty">Комментариев пока нет.</p>
+    {% endfor %}
+
+    <a href="{% url 'post_detail' post.id %}" class="action">
+        Все комментарии →
+    </a>
+</div>
+        </div>
+
+    </article>
+
+{% empty %}
+    <div class="card empty">
+        <h3>Публикаций пока нет</h3>
+        <p>Будьте первым, кто поделится своей историей!</p>
+    </div>
+{% endfor %}
+
+{% endblock %}

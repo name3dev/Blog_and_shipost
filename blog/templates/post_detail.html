@@ -1,0 +1,136 @@
+
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} — MyBlog{% endblock %}
+
+{% block content %}
+
+{% if edit_mode %}
+
+    <section class="card">
+        <h1>Редактирование публикации</h1>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <input
+                type="text"
+                name="title"
+                value="{{ post.title }}"
+                maxlength="200"
+                required
+            >
+
+            <textarea name="content" required>{{ post.content }}</textarea>
+
+            <button type="submit">Сохранить изменения</button>
+            <a href="{% url 'post_detail' post.id %}" class="button button-secondary">Отмена</a>
+        </form>
+    </section>
+
+{% elif delete_mode %}
+
+    <section class="card">
+        <h1>Удаление публикации</h1>
+        <p>Вы действительно хотите удалить публикацию «{{ post.title }}»?</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="button-danger">Да, удалить</button>
+            <a href="{% url 'post_detail' post.id %}" class="button button-secondary">Отмена</a>
+        </form>
+    </section>
+
+{% else %}
+
+    <article class="card">
+        <h1>{{ post.title }}</h1>
+
+        <div class="meta">
+            Автор:
+            {% if post.author %}
+                {{ post.author.username }}
+            {% else %}
+                Неизвестный автор
+            {% endif %}
+            · {{ post.created_at|date:"d.m.Y H:i" }}
+        </div>
+
+        <div class="post-content">
+            {{ post.content|linebreaks }}
+        </div>
+
+        {% if user.is_authenticated and post.author == user %}
+            <div class="actions">
+                <a href="{% url 'update_post' post.id %}" class="button">
+                    Редактировать
+                </a>
+
+                <a href="{% url 'delete_post' post.id %}" class="button button-danger">
+                    Удалить
+                </a>
+            </div>
+        {% endif %}
+
+        <hr>
+
+        <h3>Реакции</h3>
+
+        <div class="reactions">
+            {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'reaction' post.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="value" value="1">
+                    <button type="submit">👍 {{ likes }}</button>
+                </form>
+
+                <form method="POST" action="{% url 'reaction' post.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="value" value="-1">
+                    <button type="submit">👎 {{ dislikes }}</button>
+                </form>
+            {% else %}
+                <span>👍 {{ likes }}</span>
+                <span>👎 {{ dislikes }}</span>
+                <p><a href="{% url 'login' %}">Войдите</a>, чтобы поставить реакцию.</p>
+            {% endif %}
+        </div>
+    </article>
+
+    <section class="card">
+        <h2>Комментарии</h2>
+
+{% if user.is_authenticated %}
+    <form method="POST" action="{% url 'add_comment' post.id %}">
+        {% csrf_token %}
+
+        <textarea
+            name="content"
+            placeholder="Напишите комментарий..."
+            required
+        ></textarea>
+
+        <button type="submit">Отправить</button>
+    </form>
+{% else %}
+    <p>Войдите, чтобы оставить комментарий.</p>
+{% endif %}
+
+{% for comment in comments %}
+    <div class="comment">
+        <strong>{{ comment.author.username }}</strong>
+
+        <p>{{ comment.content|linebreaks }}</p>
+
+        <small>{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+    </div>
+{% empty %}
+    <p class="empty">Комментариев пока нет.</p>
+{% endfor %}
+    </section>
+
+{% endif %}
+
+<a href="{% url 'home' %}">← Вернуться на главную</a>
+
+{% endblock %}

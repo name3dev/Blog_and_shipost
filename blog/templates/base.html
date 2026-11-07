@@ -1,0 +1,301 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MyBlog{% endblock %}</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f5f8;
+            color: #202534;
+            font-family: Arial, sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .header {
+            background: #202b3c;
+            color: white;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .navigation {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 22px;
+        }
+
+        .navigation a {
+            color: #e4eaf2;
+            font-size: 14px;
+        }
+
+        .navigation a:hover {
+            color: #83b7ff;
+        }
+
+        .username {
+            color: #a9c8f0;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+            min-height: 70vh;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            margin-bottom: 8px;
+            font-size: 32px;
+        }
+
+        .page-heading p {
+            color: #777f8e;
+            margin: 0;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+        }
+
+        .post-title {
+            margin: 0 0 12px;
+            font-size: 23px;
+        }
+
+        .post-title a:hover {
+            color: #416da5;
+        }
+
+        .meta {
+            color: #9299a5;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .post-content {
+            font-size: 20px;
+            line-height: 1.7;
+            color: #454d5b;
+        }
+
+        input, textarea {
+            display: block;
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 15px;
+            border: 1px solid #dce0e7;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #527eae;
+        }
+
+        textarea {
+            min-height: 130px;
+            resize: vertical;
+        }
+
+        button, .button {
+            display: inline-block;
+            background: #31577f;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:hover, .button:hover {
+            background: #244363;
+        }
+
+        .button-secondary {
+            background: #e9edf3;
+            color: #34445a;
+        }
+
+        .button-secondary:hover {
+            background: #dce3ec;
+        }
+
+        .button-danger {
+            background: #c94b4b;
+        }
+
+        .button-danger:hover {
+            background: #a93838;
+        }
+
+        .actions, .reactions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .comment {
+            border-top: 1px solid #edf0f4;
+            padding: 17px 0;
+        }
+
+        .comment p {
+            line-height: 1.6;
+        }
+
+        .comment small {
+            color: #9299a5;
+        }
+
+        .auth-card {
+            max-width: 450px;
+            margin: 50px auto;
+        }
+
+        .auth-card h1 {
+            margin-top: 0;
+        }
+
+        .error {
+            color: #c0392b;
+            background: #fff0ef;
+            padding: 12px;
+            border-radius: 7px;
+        }
+
+        .empty {
+            text-align: center;
+            color: #858d9a;
+            padding: 35px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #9299a5;
+            font-size: 13px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #edf0f4;
+            margin: 25px 0;
+        }
+
+        @media (max-width: 650px) {
+            .header {
+                padding: 18px 5%;
+            }
+
+            .navigation {
+                gap: 13px;
+            }
+
+            .container {
+                margin-top: 25px;
+            }
+
+            .page-heading h1 {
+                font-size: 26px;
+            }
+        }
+
+        .comments-preview {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(65, 139, 195, 0.2);
+        }
+
+        .comments-preview h3 {
+            font-size: 17px;
+                margin-bottom: 15px;
+        }
+
+        .comment {
+        background: rgba(255, 255, 255, 0.4);
+        border-left: 3px solid #55a9e0;
+        padding: 4px 5px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        }
+
+.comment p {
+    margin: 2px 0;
+    color: #34536e;
+}
+
+.comment small {
+    color: #66839d;
+}
+    </style>
+</head>
+
+<body>
+
+<header class="header">
+    <a href="{% url 'home' %}" class="logo">MyBlog.</a>
+
+    <nav class="navigation">
+        <a href="{% url 'home' %}">Главная</a>
+        <a href="{% url 'posts' %}">Все посты</a>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'home' %}#create-post">Написать пост</a>
+            <span class="username">{{ user.username }}</span>
+            <a href="{% url 'logout' %}">Выйти</a>
+        {% else %}
+            <a href="{% url 'login' %}">Войти</a>
+            <a href="{% url 'register' %}">Регистрация</a>
+        {% endif %}
+    </nav>
+</header>
+
+<main class="container">
+    {% block content %}
+    {% endblock %}
+</main>
+
+<footer class="footer">
+    MyBlog. Все публикации в одном месте.
+</footer>
+
+</body>
+</html>

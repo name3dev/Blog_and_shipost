@@ -1,0 +1,78 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if auth_type == 'register' %}
+        Регистрация
+    {% else %}
+        Вход
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<section class="card auth-card">
+
+    {% if auth_type == 'register' %}
+
+        <h1>Создание аккаунта</h1>
+        <p class="meta">Зарегистрируйтесь, чтобы публиковать записи.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <input
+                type="text"
+                name="username"
+                placeholder="Придумайте логин"
+                required
+            >
+
+            <input
+                type="password"
+                name="password"
+                placeholder="Придумайте пароль"
+                required
+            >
+
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+
+        <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+
+    {% else %}
+
+        <h1>С возвращением!</h1>
+        <p class="meta">Войдите в свой аккаунт.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <input
+                type="text"
+                name="username"
+                placeholder="Ваш логин"
+                required
+            >
+
+            <input
+                type="password"
+                name="password"
+                placeholder="Ваш пароль"
+                required
+            >
+
+            <button type="submit">Войти</button>
+        </form>
+
+        <p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p>
+
+    {% endif %}
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+</section>
+
+{% endblock %}
