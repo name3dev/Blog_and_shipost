@@ -117,15 +117,55 @@
 {% endif %}
 
 {% for comment in comments %}
+
     <div class="comment">
-        <strong>{{ comment.author.username }}</strong>
 
-        <p>{{ comment.content|linebreaks }}</p>
+        {% if edit_comment_id == comment.id %}
 
-        <small>{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+            <strong>Редактирование комментария</strong>
+
+            <form method="POST" action="{% url 'edit_comment' comment.id %}">
+                {% csrf_token %}
+
+                <textarea name="content" required>{{ comment.content }}</textarea>
+
+                <button type="submit">Сохранить изменения</button>
+
+                <a href="{% url 'post_detail' post.id %}" class="button button-secondary">
+                    Отмена
+                </a>
+            </form>
+
+        {% else %}
+
+            <strong>{{ comment.author.username }}</strong>
+
+            <p>{{ comment.content|linebreaks }}</p>
+
+            <small>
+                Создан: {{ comment.created_at|date:"d.m.Y H:i" }}
+
+                {% if comment.edited_at %}
+                    · Изменён: {{ comment.edited_at|date:"d.m.Y H:i" }}
+                {% endif %}
+            </small>
+
+            {% if user.is_authenticated and user == comment.author %}
+                <div class="actions">
+                    <a href="{% url 'edit_comment' comment.id %}" class="button button-secondary">
+                        Редактировать
+                    </a>
+                </div>
+            {% endif %}
+
+        {% endif %}
+
     </div>
+
 {% empty %}
+
     <p class="empty">Комментариев пока нет.</p>
+
 {% endfor %}
     </section>
 

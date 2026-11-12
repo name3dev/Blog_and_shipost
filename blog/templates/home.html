@@ -50,13 +50,11 @@
 
 {% for post in posts %}
     <article class="card">
+
         <h2 class="post-title">
             <a href="{% url 'post_detail' post.id %}">
                 {{ post.title }}
             </a>
-            <div class="post-content">
-            {{ post.content|linebreaks }}
-        </div>
         </h2>
 
         <div class="meta">
@@ -67,23 +65,38 @@
                 Неизвестный автор
             {% endif %}
             · {{ post.created_at|date:"d.m.Y H:i" }}
-            <div class="comments-preview">
-    <h3>Комментарии ({{ post.comments_count }})</h3>
-
-    {% for comment in post.comments_preview %}
-        <div class="comment">
-            <strong>{{ comment.author.username }}</strong>
-            <p>{{ comment.content }}</p>
-            <small>{{ comment.created_at|date:"d.m.Y H:i" }}</small>
         </div>
-    {% empty %}
-        <p class="empty">Комментариев пока нет.</p>
-    {% endfor %}
 
-    <a href="{% url 'post_detail' post.id %}" class="action">
-        Все комментарии →
-    </a>
-</div>
+        <div class="post-content">
+            {{ post.content|linebreaks }}
+        </div>
+
+        <div class="comments-preview">
+
+            <h3>Комментарии ({{ post.comments_count }})</h3>
+
+            {% for comment in post.comments_preview %}
+                <div class="comment">
+    <strong>{{ comment.author.username }}</strong>
+
+    <p>{{ comment.content|linebreaks }}</p>
+
+        <small>
+            Создан: {{ comment.created_at|date:"d.m.Y H:i" }}
+
+                {% if comment.edited_at %}
+                    · Изменён: {{ comment.edited_at|date:"d.m.Y H:i" }}
+                {% endif %}
+            </small>
+            </div>
+            {% empty %}
+                <p class="empty">Комментариев пока нет.</p>
+            {% endfor %}
+
+            <a href="{% url 'post_detail' post.id %}" class="button">
+                Все комментарии →
+            </a>
+
         </div>
 
     </article>

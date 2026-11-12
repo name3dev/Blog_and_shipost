@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-
+from django.utils import timezone
 from .models import Post, Comment, Like
 
 
@@ -16,7 +16,9 @@ def home(request):
             post=post
         ).select_related('author').order_by('-created_at')[:3]
 
-        post.comments_count = Comment.objects.filter(post=post).count()
+        post.comments_count = Comment.objects.filter(
+            post=post
+        ).count()
 
     return render(request, 'home.html', {
         'posts': posts
@@ -197,3 +199,35 @@ def reaction(request, post_id):
                 )
 
     return redirect('post_detail', post_id=post.id)
+
+@login_required(login_url='login')
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(
+        Comment,
+        id=comment_id,
+        author=request.user
+    )
+
+    if request.method == 'POST':
+        content = request.POST.get('content', '').strip()
+
+        if content:
+            comment.content = content
+            comment.edited_at = timezone.now()
+            comment.save()
+
+        return redirect('post_detail', post_id=comment.post.id)
+
+    post = comment.post
+
+    comments = Comment.objects.filter(
+        post=post
+    ).select_related('author').order_by('-created_at')
+
+    return render(request, 'post_detail.html', {
+        'post': post,
+        'comments': comments,
+        'likes': Like.objects.filter(post=post, value=1).count(),
+        'dislikes': Like.objects.filter(post=post, value=-1).count(),
+        'edit_comment_id': comment.id
+    })
